@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Truck } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -10,6 +11,7 @@ interface MenuItem {
   price: number;
   image_url: string | null;
   is_active: boolean;
+  is_delivery?: boolean;
 }
 
 interface Category {
@@ -24,9 +26,16 @@ function formatPrice(value: number) {
 
 export default function CardapioClient({ categories }: { categories: Category[] }) {
   const [activeCategory, setActiveCategory] = useState<string>("todos");
+  const [showOnlyDelivery, setShowOnlyDelivery] = useState(false);
 
-  const filtered =
-    activeCategory === "todos"
+  let filtered = showOnlyDelivery
+    ? categories
+        .map((c) => ({
+          ...c,
+          items: c.items.filter((item) => item.is_delivery),
+        }))
+        .filter((c) => c.items.length > 0)
+    : activeCategory === "todos"
       ? categories.filter((c) => c.items.length > 0)
       : categories.filter((c) => c.id === activeCategory && c.items.length > 0);
 
@@ -35,30 +44,48 @@ export default function CardapioClient({ categories }: { categories: Category[] 
       {/* Filtros / Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-10 scrollbar-hide">
         <button
-          onClick={() => setActiveCategory("todos")}
+          onClick={() => {
+            setShowOnlyDelivery(false);
+            setActiveCategory("todos");
+          }}
           className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-            activeCategory === "todos"
+            !showOnlyDelivery && activeCategory === "todos"
               ? "bg-red-600 text-white shadow-md"
               : "bg-white border border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600"
           }`}
         >
           Todos
         </button>
-        {categories
-          .filter((c) => c.items.length > 0)
-          .map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                activeCategory === cat.id
-                  ? "bg-red-600 text-white shadow-md"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
+
+        {/* Botão Delivery */}
+        <button
+          onClick={() => setShowOnlyDelivery(!showOnlyDelivery)}
+          className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+            showOnlyDelivery
+              ? "bg-red-600 text-white shadow-md"
+              : "bg-white border border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600"
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          Delivery
+        </button>
+
+        {!showOnlyDelivery &&
+          categories
+            .filter((c) => c.items.length > 0)
+            .map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  activeCategory === cat.id
+                    ? "bg-red-600 text-white shadow-md"
+                    : "bg-white border border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
       </div>
 
       {/* Grid de pratos */}
@@ -66,7 +93,10 @@ export default function CardapioClient({ categories }: { categories: Category[] 
         {filtered.map((cat) => (
           <div key={cat.id}>
             <div className="flex items-center gap-4 mb-6">
-              <h2 className="text-2xl font-extrabold text-gray-900">{cat.name}</h2>
+              <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+                {cat.name}
+                {showOnlyDelivery && <Truck className="w-6 h-6 text-orange-600" />}
+              </h2>
               <div className="flex-1 h-px bg-linear-to-r from-orange-200 to-transparent" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -76,6 +106,12 @@ export default function CardapioClient({ categories }: { categories: Category[] 
                   className="group flex flex-col rounded-2xl bg-white shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border border-purple-100 overflow-hidden"
                 >
                   <div className="relative h-48 bg-linear-to-br from-red-50 to-orange-50 overflow-hidden">
+                    {item.is_delivery && (
+                      <div className="absolute top-2 right-2 z-10 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                        <Truck className="w-3 h-3" />
+                        Delivery
+                      </div>
+                    )}
                     {item.image_url ? (
                       <Image
                         src={item.image_url}
@@ -118,7 +154,11 @@ export default function CardapioClient({ categories }: { categories: Category[] 
       {filtered.length === 0 && (
         <div className="text-center py-20">
           <p className="text-5xl mb-4">🍽️</p>
-          <p className="text-gray-500">Nenhum item disponível nessa categoria.</p>
+          <p className="text-gray-500">
+            {showOnlyDelivery
+              ? "Nenhum item disponível para delivery."
+              : "Nenhum item disponível nessa categoria."}
+          </p>
         </div>
       )}
     </div>

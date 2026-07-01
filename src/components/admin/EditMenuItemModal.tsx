@@ -18,6 +18,7 @@ interface MenuItem {
   price: number;
   image_url: string | null;
   is_active: boolean;
+  is_delivery?: boolean;
   categoryId: string;
   category: Category;
 }
@@ -117,17 +118,31 @@ export default function EditMenuItemModal({ item, categories, onClose }: Props) 
 
         <ImageUpload name="image_url" defaultValue={item.image_url} label="Imagem do Prato" />
 
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="is_active"
-            id="edit_is_active"
-            defaultChecked={item.is_active}
-            className="rounded accent-orange-500"
-          />
-          <label htmlFor="edit_is_active" className="text-sm text-gray-600">
-            Visível no cardápio
-          </label>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="is_active"
+              id="edit_is_active"
+              defaultChecked={item.is_active}
+              className="rounded accent-orange-500"
+            />
+            <label htmlFor="edit_is_active" className="text-sm text-gray-600">
+              Visível no cardápio
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="is_delivery"
+              id="edit_is_delivery"
+              defaultChecked={item.is_delivery ?? false}
+              className="rounded accent-orange-500"
+            />
+            <label htmlFor="edit_is_delivery" className="text-sm text-gray-600">
+              Disponível para Delivery
+            </label>
+          </div>
         </div>
 
         <div className="flex gap-3 pt-2">

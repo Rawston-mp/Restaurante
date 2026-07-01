@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Pencil, Trash2, Eye, EyeOff, Truck } from "lucide-react";
 import { deleteMenuItem, updateMenuItemActive } from "@/actions/actions";
 import EditMenuItemModal from "./EditMenuItemModal";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -18,6 +18,7 @@ interface MenuItem {
   price: number;
   image_url: string | null;
   is_active: boolean;
+  is_delivery?: boolean;
   categoryId: string;
   category: Category;
 }
@@ -66,6 +67,7 @@ export default function MenuItemsTable({ items, categories }: Props) {
                 <th className="px-4 py-3 text-left">Categoria</th>
                 <th className="px-4 py-3 text-right">Preço</th>
                 <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Delivery</th>
                 <th className="px-4 py-3 text-center">Ações</th>
               </tr>
             </thead>
@@ -119,6 +121,16 @@ export default function MenuItemsTable({ items, categories }: Props) {
                         <EyeOff className="w-4 h-4 text-gray-400" />
                       )}
                     </button>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {item.is_delivery ? (
+                      <span className="bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                        <Truck className="w-3 h-3" />
+                        Sim
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 text-xs">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">

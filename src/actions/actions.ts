@@ -157,6 +157,7 @@ const menuItemSchema = z.object({
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   image_url: imageUrlField,
   is_active: z.coerce.boolean().optional().default(true),
+  is_delivery: z.coerce.boolean().optional().default(false),
 });
 
 export async function getMenuItems() {
@@ -186,6 +187,7 @@ export async function createMenuItem(formData: FormData) {
     categoryId: formData.get("categoryId"),
     image_url: formData.get("image_url"),
     is_active: formData.get("is_active") === "on",
+    is_delivery: formData.get("is_delivery") === "on",
   };
   const validation = menuItemSchema.safeParse(raw);
   if (!validation.success) return;
@@ -197,6 +199,7 @@ export async function createMenuItem(formData: FormData) {
       categoryId: validation.data.categoryId,
       image_url: validation.data.image_url ?? null,
       is_active: validation.data.is_active,
+      is_delivery: validation.data.is_delivery,
     },
   });
   revalidatePath("/admin/cardapio");
@@ -217,6 +220,7 @@ export async function updateMenuItem(id: string, formData: FormData): Promise<vo
     categoryId: formData.get("categoryId"),
     image_url: formData.get("image_url"),
     is_active: formData.get("is_active") === "on",
+    is_delivery: formData.get("is_delivery") === "on",
   };
   const validation = menuItemSchema.safeParse(raw);
   if (!validation.success) return;
@@ -229,6 +233,7 @@ export async function updateMenuItem(id: string, formData: FormData): Promise<vo
       categoryId: validation.data.categoryId,
       image_url: validation.data.image_url ?? null,
       is_active: validation.data.is_active,
+      is_delivery: validation.data.is_delivery,
     },
   });
   revalidatePath("/admin/cardapio");

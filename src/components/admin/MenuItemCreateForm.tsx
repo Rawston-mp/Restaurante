@@ -83,17 +83,30 @@ export default function MenuItemCreateForm({ categories }: { categories: Categor
 
       <ImageUpload name="image_url" label="Imagem do Prato" />
 
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          name="is_active"
-          id="is_active"
-          defaultChecked
-          className="rounded accent-orange-500"
-        />
-        <label htmlFor="is_active" className="text-sm text-gray-600">
-          Visível no cardápio
-        </label>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="is_active"
+            id="is_active"
+            defaultChecked
+            className="rounded accent-orange-500"
+          />
+          <label htmlFor="is_active" className="text-sm text-gray-600">
+            Visível no cardápio
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="is_delivery"
+            id="is_delivery"
+            className="rounded accent-orange-500"
+          />
+          <label htmlFor="is_delivery" className="text-sm text-gray-600">
+            Disponível para Delivery
+          </label>
+        </div>
       </div>
 
       <SubmitButton label="Adicionar Prato" pendingLabel="Adicionando..." />

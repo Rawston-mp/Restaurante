@@ -34,6 +34,7 @@ model MenuItem {
   price       Float
   image_url   String?
   is_active   Boolean  @default(true)
+  is_delivery Boolean  @default(false)
   categoryId  String   @map("category_id")
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now()) @map("created_at")
