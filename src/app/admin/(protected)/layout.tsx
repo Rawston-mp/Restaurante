@@ -27,6 +27,7 @@ export default async function AdminLayout({
           <nav className="flex md:hidden gap-1 overflow-x-auto">
             <a href="/admin" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Dashboard</a>
             <a href="/admin/cardapio" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Cardápio</a>
+            <a href="/admin/cardapio-diario" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Diário</a>
             <a href="/admin/fotos" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Fotos</a>
             <a href="/admin/configuracoes" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Config.</a>
             <a href="/admin/senha" className="text-xs font-medium text-gray-600 hover:text-orange-500 px-2 py-1 rounded-lg hover:bg-orange-50 whitespace-nowrap transition-colors">Senha</a>

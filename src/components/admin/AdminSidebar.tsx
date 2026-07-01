@@ -17,6 +17,7 @@ import {
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
   { label: "Cardápio", href: "/admin/cardapio", icon: UtensilsCrossed },
+  { label: "Cardápio Diário", href: "/admin/cardapio-diario", icon: Utensils },
   { label: "Fotos", href: "/admin/fotos", icon: Camera },
   { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
   { label: "Senha", href: "/admin/senha", icon: KeyRound },

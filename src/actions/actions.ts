@@ -158,6 +158,7 @@ const menuItemSchema = z.object({
   image_url: imageUrlField,
   is_active: z.coerce.boolean().optional().default(true),
   is_delivery: z.coerce.boolean().optional().default(false),
+  sectionId: z.string().optional(),
 });
 
 export async function getMenuItems() {
@@ -188,9 +189,14 @@ export async function createMenuItem(formData: FormData) {
     image_url: formData.get("image_url"),
     is_active: formData.get("is_active") === "on",
     is_delivery: formData.get("is_delivery") === "on",
+    sectionId: formData.get("sectionId"),
   };
+  
   const validation = menuItemSchema.safeParse(raw);
-  if (!validation.success) return;
+  if (!validation.success) {
+    return;
+  }
+  
   await prisma.menuItem.create({
     data: {
       name: validation.data.name,
@@ -200,10 +206,14 @@ export async function createMenuItem(formData: FormData) {
       image_url: validation.data.image_url ?? null,
       is_active: validation.data.is_active,
       is_delivery: validation.data.is_delivery,
+      sectionId: validation.data.sectionId ?? null,
     },
   });
+  
   revalidatePath("/admin/cardapio");
   revalidatePath("/cardapio");
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
 }
 
 export async function updateMenuItemActive(id: string, is_active: boolean) {
@@ -283,6 +293,138 @@ export async function deleteGalleryItem(id: string) {
   await prisma.gallery.delete({ where: { id } });
   revalidatePath("/admin/fotos");
   revalidatePath("/fotos");
+}
+
+// ─── Daily Menu Sections ──────────────────────────────────────────────────────
+
+export async function getDailyMenuSections() {
+  return prisma.dailyMenuSection.findMany({
+    orderBy: { order: "asc" },
+    include: {
+      items: {
+        where: { is_active: true },
+        orderBy: { order: "asc" },
+        include: { category: true },
+      },
+    },
+  });
+}
+
+const dailyMenuSectionSchema = z.object({
+  name: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
+  isActive: z.boolean().optional().default(true),
+  order: z.coerce.number().optional().default(0),
+});
+
+export async function createDailyMenuSection(formData: FormData) {
+  const raw = {
+    name: formData.get("name"),
+    isActive: formData.get("isActive") === "on",
+    order: formData.get("order"),
+  };
+  const validation = dailyMenuSectionSchema.safeParse(raw);
+  if (!validation.success) return;
+
+  const lastSection = await prisma.dailyMenuSection.findFirst({
+    orderBy: { order: "desc" },
+  });
+
+  await prisma.dailyMenuSection.create({
+    data: {
+      name: validation.data.name,
+      isActive: validation.data.isActive,
+      order: lastSection ? lastSection.order + 1 : 0,
+    },
+  });
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
+}
+
+export async function updateDailyMenuSection(id: string, formData: FormData) {
+  const raw = {
+    name: formData.get("name"),
+    isActive: formData.get("isActive") === "on",
+    order: formData.get("order"),
+  };
+  const validation = dailyMenuSectionSchema.safeParse(raw);
+  if (!validation.success) return;
+
+  await prisma.dailyMenuSection.update({
+    where: { id },
+    data: {
+      name: validation.data.name,
+      isActive: validation.data.isActive,
+      order: validation.data.order,
+    },
+  });
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
+}
+
+export async function duplicateDailyMenuSection(id: string) {
+  const section = await prisma.dailyMenuSection.findUnique({
+    where: { id },
+    include: { items: true },
+  });
+
+  if (!section) return;
+
+  const newSection = await prisma.dailyMenuSection.create({
+    data: {
+      name: `${section.name} (Cópia)`,
+      isActive: section.isActive,
+      order: section.order + 1,
+      items: {
+        create: section.items.map((item) => ({
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          image_url: item.image_url,
+          is_active: item.is_active,
+          is_delivery: item.is_delivery,
+          is_new: item.is_new,
+          is_unavailable: item.is_unavailable,
+          order: item.order,
+          categoryId: item.categoryId,
+        })),
+      },
+    },
+  });
+
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
+  return newSection;
+}
+
+export async function deleteDailyMenuSection(id: string) {
+  await prisma.dailyMenuSection.delete({ where: { id } });
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
+}
+
+export async function reorderDailyMenuSections(
+  sections: { id: string; order: number }[]
+) {
+  for (const section of sections) {
+    await prisma.dailyMenuSection.update({
+      where: { id: section.id },
+      data: { order: section.order },
+    });
+  }
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
+}
+
+export async function updateMenuItemFlags(
+  id: string,
+  flags: { is_new?: boolean; is_unavailable?: boolean }
+) {
+  await prisma.menuItem.update({
+    where: { id },
+    data: flags,
+  });
+  revalidatePath("/admin/cardapio-diario");
+  revalidatePath("/cardapio-diario");
 }
 
 // ─── Settings ────────────────────────────────────────────────────────────────
