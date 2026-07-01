@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./prisma/dev.db
+      - SESSION_SECRET=${SESSION_SECRET}
+      - NEXT_PUBLIC_RESTAURANT_NAME=${NEXT_PUBLIC_RESTAURANT_NAME:-Meu Restaurante}
+    volumes:
+      # Persiste o banco SQLite e os uploads entre reinicializações
+      - ./prisma/dev.db:/app/prisma/dev.db
+      - ./public/uploads:/app/public/uploads
+    restart: unless-stopped
